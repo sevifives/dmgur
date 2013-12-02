@@ -1,7 +1,10 @@
 package models
 import play.api.Play.current
+import scala.slick.session.Session
+import scala.slick.driver.H2Driver
+import scala.slick.driver.SQLiteDriver
 
-case class Image(id: Option[Int], name: String, description: String, ownerId: Int)
+case class Image(name: String, fileName: String, description: String, ownerId: Int, id: Option[Int] = None)
 
 trait ImageComponent {
   this: Profile with UserComponent =>
@@ -9,13 +12,20 @@ trait ImageComponent {
   import profile.simple._
   
   object Images extends Table[Image]("images") {
-    def id = column[Int]("ID",O.PrimaryKey,O.AutoInc)
-    def name = column[String]("NAME")
-    def description = column[String]("Description")
-    def ownerId = column[Int]("OWNER_ID")
+    def id = column[Option[Int]]("id",O.PrimaryKey,O.AutoInc)
+    def name = column[String]("name")
+    def fileName = column[String]("file_name")
+    def description = column[String]("description")
+    def ownerId = column[Int]("owner_id")
     
-    def * = id.? ~ name ~ description ~ ownerId <> (Image, Image.unapply _)
+    def * = name ~ fileName ~ description ~ ownerId ~ id <> (Image, Image.unapply _)
     
-    def owner = foreignKey("OWNER_FK", ownerId, Users)(_.id)
+    def owner = foreignKey("owner_fk", ownerId, Users)(_.id.get)
+    
+    val autoInc = name ~ fileName ~ description ~ ownerId returning id into { case (name, fileName, description, ownerId, id) => Image(name, fileName, description, ownerId, id) }
+
+    def insert(picture: Image)(implicit session: Session): Image = {
+      autoInc.insert(image.name, image.fileName, image.description, image.ownerId)
+    }
   }
 }

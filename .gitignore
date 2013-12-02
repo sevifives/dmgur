@@ -1,0 +1,12 @@
+/.scala_dependencies
+
+/target/
+/project/target/
+/project/project/
+/logs/
+/bin/
+/.target/
+/.settings/
+/.project
+/.classpath
+/.cache

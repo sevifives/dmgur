@@ -9,13 +9,13 @@ trait CommentComponent {
   import profile.simple._
   
   object Comments extends Table[Comment]("comments") {
-    def id = column[Int]("ID", O.PrimaryKey,O.AutoInc)
-    def objId = column[Int]("OBJ_ID")
-    def objType = column[Int]("OBJ_TYPE")
-    def userId = column[Int]("USER_ID")
-    def value = column[String]("VALUE")
+    def id = column[Int]("id", O.PrimaryKey,O.AutoInc)
+    def objId = column[Int]("obj_id")
+    def objType = column[Int]("obj_type")
+    def userId = column[Int]("user_id")
+    def value = column[String]("value")
   
-    def user = foreignKey("USER_FK", userId, Users)(_.id)
+    def user = foreignKey("user_fk", userId, Users)(_.id)
 
     def * = id.? ~ objId ~ objType ~ userId ~ value <> (Comment, Comment.unapply _)
   }
